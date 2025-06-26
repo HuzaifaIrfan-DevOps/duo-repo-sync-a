@@ -26,7 +26,9 @@ jobs:
 
       - name: Push to Repo Skiie-IT
         env:
-          PAT: ${{ secrets.GH_PAT }}
+          GH_USERNAME: ${{ secrets.GH_USERNAME }}  # Your GitHub username
+          GH_PAT: ${{ secrets.GH_PAT }}            # Your personal access token
         run: |
-          git remote add target https://x-access-token:${PAT}@github.com/Skiie-IT/duo-repo-sync
-          git push target main
+          git remote add target https://${GH_USERNAME}:${GH_PAT}@github.com/Skiie-IT/duo-repo-sync.git
+          git push target main --force --set-upstream
+
