@@ -28,5 +28,5 @@ jobs:
         env:
           PAT: ${{ secrets.GH_PAT }}
         run: |
-          git remote add target https://x-access-token:${PAT}@github.com/Skiie-IT/duo-repo-sync.git
+          git remote add target https://x-access-token:${PAT}@github.com/Skiie-IT/duo-repo-sync
           git push target main
