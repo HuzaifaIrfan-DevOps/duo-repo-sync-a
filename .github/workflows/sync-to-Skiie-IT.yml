@@ -1,0 +1,32 @@
+name: Sync to Repo Skiie-IT
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo HuzaifaIrfan
+        uses: actions/checkout@v4
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Prevent sync loop
+        run: |
+          if git log -1 --pretty=%B | grep -q "[Sync from Repo Skiie-IT]"; then
+            echo "Sync commit from Repo Skiie-IT detected. Skipping."
+            exit 0
+          fi
+
+      - name: Push to Repo Skiie-IT
+        env:
+          PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git remote add target https://x-access-token:${PAT}@github.com/Skiie-IT/duo-repo-sync.git
+          git push target main --force
