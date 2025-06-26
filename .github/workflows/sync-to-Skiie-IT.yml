@@ -19,16 +19,24 @@ jobs:
 
       - name: Prevent sync loop
         run: |
-          if git log -1 --pretty=%B | grep -q "[Sync from Repo Skiie-IT]"; then
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [ "$LAST_COMMIT_MSG" = "[Sync from Repo Skiie-IT]" ]; then
             echo "Sync commit from Repo Skiie-IT detected. Skipping."
             exit 0
           fi
 
-      - name: Push to Repo Skiie-IT
-        env:
-          GH_USERNAME: ${{ secrets.GH_USERNAME }}  # Your GitHub username
-          GH_PAT: ${{ secrets.GH_PAT }}            # Your personal access token
+      - name: Setup SSH deploy key
         run: |
-          git remote add target https://${GH_USERNAME}:${GH_PAT}@github.com/Skiie-IT/duo-repo-sync.git
-          git push target main --force --set-upstream
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+      - name: Create sync commit (optional)
+        run: |
+          git commit --allow-empty -m "[Sync from Repo HuzaifaIrfan]"
+
+      - name: Push to Repo Skiie-IT via SSH
+        run: |
+          git remote add target git@github.com:Skiie-IT/duo-repo-sync.git
+          git push target main --force --set-upstream
